@@ -12,31 +12,35 @@ public class Solution {
 		StringBuilder sb = new StringBuilder();
 
 		int T = Integer.parseInt(br.readLine());
+		long[] factorial = new long[1000001];
+		factorial[0] = 1;
+		for (int i = 1; i <= 1000000; i++) {
+			factorial[i] = factorial[i - 1] * i % MOD;
+		}
 		for (int tc = 1; tc <= T; tc++) {
 			st = new StringTokenizer(br.readLine());
 			N = Integer.parseInt(st.nextToken());
 			R = Integer.parseInt(st.nextToken());
 
-			long[] fact = new long[N + 1];
-			fact[0] = 1;
-			for (int i = 1; i <= N; i++) {
-				fact[i] = (fact[i - 1] * i) % MOD;
-			}
-
-			long bottom = (fact[R] * fact[N - R]) % MOD;
+			long bottom = factorial[R] * factorial[N - R] % MOD;
 			bottom = fermat(bottom, MOD - 2);
 
-			sb.append("#").append(tc).append(" ").append((fact[N] * bottom) % MOD).append("\n");
+			sb.append("#").append(tc).append(" ").append((factorial[N] * bottom) % MOD).append("\n");
 		}
 		System.out.println(sb);
 	}
 
-	private static long fermat(long n, int x) {
-		if (x == 0) return 1;
+	private static long fermat(long a, int p) {
+		if (p == 0) {
+			return 1;
+		}
 
-		long tmp = fermat(n, x / 2);
-		long ret = (tmp * tmp) % MOD;
-		if (x % 2 == 0) return ret;
-		else return (ret * n) % MOD;
+		long half = fermat(a, p / 2);
+
+		if (p % 2 == 0) {
+			return ((half % MOD) * (half % MOD)) % MOD;
+		} else {
+			return ((half * a) % MOD * (half % MOD)) % MOD;
+		}
 	}
 }
