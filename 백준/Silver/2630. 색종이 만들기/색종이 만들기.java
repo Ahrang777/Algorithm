@@ -26,31 +26,58 @@ public class Main {
     }
 
     private static void cut(int x, int y, int len) {
-        int white = 0, blue = 0;
+        int standard = map[x][y];
+        boolean flag = false;
         for (int i = 0; i < len; i++) {
             for (int j = 0; j < len; j++) {
-                if (map[x + i][y + j] == 0) {
-                    white++;
-                } else {
-                    blue++;
+                if (map[x + i][y + j] != standard) {
+                    flag = true;
+                    break;
                 }
+            }
+            if (flag) {
+                break;
             }
         }
 
-        if (white == len * len) {
-            whiteCnt++;
-            return;
+        if (flag) {
+            cut(x, y, len / 2);
+            cut(x + len / 2, y, len / 2);
+            cut(x, y + len / 2, len / 2);
+            cut(x + len / 2, y + len / 2, len / 2);
+        } else {
+            if (standard == 0) {
+                whiteCnt++;
+            } else {
+                blueCnt++;
+            }
         }
 
-        if (blue == len * len) {
-            blueCnt++;
-            return;
-        }
-
-        cut(x, y, len / 2);
-        cut(x + len / 2, y, len / 2);
-        cut(x, y + len / 2, len / 2);
-        cut(x + len / 2, y + len / 2, len / 2);
+//        int white = 0, blue = 0;
+//        for (int i = 0; i < len; i++) {
+//            for (int j = 0; j < len; j++) {
+//                if (map[x + i][y + j] == 0) {
+//                    white++;
+//                } else {
+//                    blue++;
+//                }
+//            }
+//        }
+//
+//        if (white == len * len) {
+//            whiteCnt++;
+//            return;
+//        }
+//
+//        if (blue == len * len) {
+//            blueCnt++;
+//            return;
+//        }
+//
+//        cut(x, y, len / 2);
+//        cut(x + len / 2, y, len / 2);
+//        cut(x, y + len / 2, len / 2);
+//        cut(x + len / 2, y + len / 2, len / 2);
     }
 
 }
