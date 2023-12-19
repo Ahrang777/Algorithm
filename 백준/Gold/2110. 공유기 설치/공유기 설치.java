@@ -1,46 +1,54 @@
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 
 public class Main {
+    static int N, C, max;
+    static int[] homes;
     public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
-		int N = Integer.parseInt(st.nextToken());
-		int C = Integer.parseInt(st.nextToken());
+        N = Integer.parseInt(st.nextToken());
+        C = Integer.parseInt(st.nextToken());
+        max = Integer.MIN_VALUE;
 
-		int[] homes = new int[N];
-		for (int i = 0; i < N; i++) {
-			homes[i] = Integer.parseInt(br.readLine());
-		}
+        homes = new int[N];
 
-		Arrays.sort(homes);
+        for (int i = 0; i < N; i++) {
+            homes[i] = Integer.parseInt(br.readLine());
+        }
 
-		int start = 1;
-		int end = homes[N - 1] - homes[0];
-		int result = 0;
+        Arrays.sort(homes);
 
-		while (start <= end) {
-			int mid = (start + end) / 2;	// 가장 인접한 공유기 사이 거리
+        int start = 1;
+        int end = homes[N - 1] - homes[0];
+        int result = 0;
 
-			int prev = 0;
-			int cnt = 1;
+        while (start <= end) {
+            // 두 공유기 사이 거리의 최솟값
+            int mid = (start + end) / 2;
 
-			for (int i = 1; i < N; i++) {
-				if (homes[i] - homes[prev] >= mid) {
-					cnt++;
-					prev = i;
-				}
-			}
+            int cnt = 1;
+            int prev = 0;
 
-			if (cnt >= C) {
-				start = mid + 1;
-				result = Math.max(result, mid);
-			} else {
-				end = mid - 1;
-			}
-		}
+            for (int i = 1; i < N; i++) {
+                if (homes[i] - homes[prev] >= mid) {
+                    cnt++;
+                    prev = i;
+                }
+            }
 
-		System.out.println(result);
-	}
+            if (cnt >= C) {
+                start = mid + 1;
+                result = Math.max(result, mid);
+            } else {
+                end = mid - 1;
+            }
+        }
+
+        System.out.println(result);
+    }
 }
