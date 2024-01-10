@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int N, C, max;
-    static int[] homes;
+    static int N, C, max, homes[];
+
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
@@ -23,12 +23,11 @@ public class Main {
 
         Arrays.sort(homes);
 
+        // 가장 가까운 공유기 사이 거리
         int start = 1;
         int end = homes[N - 1] - homes[0];
-        int result = 0;
 
         while (start <= end) {
-            // 두 공유기 사이 거리의 최솟값
             int mid = (start + end) / 2;
 
             int cnt = 1;
@@ -43,12 +42,13 @@ public class Main {
 
             if (cnt >= C) {
                 start = mid + 1;
-                result = Math.max(result, mid);
+                max = Math.max(max, mid);
             } else {
                 end = mid - 1;
             }
         }
 
-        System.out.println(result);
+        System.out.println(max);
     }
+
 }
