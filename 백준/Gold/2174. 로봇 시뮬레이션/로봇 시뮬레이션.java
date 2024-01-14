@@ -40,11 +40,16 @@ public class Main {
         // map[y][x] 형태로 작성
         for (int i = 1; i <= N; i++) {
             st = new StringTokenizer(br.readLine());
+
+            // 입력은 (x, y)좌표이지만 배열상에서 (y, x) 로 생각해야 한다.
+            // 또한 y의 경우도 좌표에서는 위로 커지지만 배열은 아래로 커지기에
+            // dx, dy를 좌표와 배열을 비교해 가며 생각해야 한다.
             int y = Integer.parseInt(st.nextToken()) - 1;
             int x = Integer.parseInt(st.nextToken()) - 1;
 
             char ch = st.nextToken().charAt(0);
 
+            // 문자로 받은 방향을 정수로 변환 >> dx, dy 배열을 이용하기 위해
             int dir = getDir(ch);
             map[x][y] = i;
             robots.put(i, new Robot(x, y, dir));
