@@ -4,148 +4,138 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
-    static class Shark {
-        int x, y, dir, eatSum;
-
-        Shark() { }
-
-        Shark(int x, int y, int dir, int eatSum) {
-            this.x = x;
-            this.y = y;
-            this.dir = dir;
-            this.eatSum = eatSum;
-        }
-    }
-
     static class Fish {
-        int x, y, index, dir;
-        boolean isAlive = true;
+        int index, x, y, dir;
+        boolean isAlive;
 
-        Fish() { }
-
-        Fish(int x, int y, int index, int dir, boolean isAlive) {
+        public Fish(int index, int x, int y, int dir, boolean isAlive) {
+            this.index = index;
             this.x = x;
             this.y = y;
-            this.index = index;
             this.dir = dir;
             this.isAlive = isAlive;
         }
     }
 
+    static class Shark {
+        int x, y, dir, eat;
+
+        public Shark(int x, int y, int dir, int eat) {
+            this.x = x;
+            this.y = y;
+            this.dir = dir;
+            this.eat = eat;
+        }
+    }
+
+    static int[][] map, copiedMap;
+    static List<Fish> fishes, copiedFishes;
+    static int max;
+    static Shark s;
     static int[] dx = {-1, -1, 0, 1, 1, 1, 0, -1};
     static int[] dy = {0, -1, -1, -1, 0, 1, 1, 1};
-    static int maxSum = 0;
-
-    static final int BLANK = 0;
-    static final int SHARK = -1;
 
     public static void main(String[] args) throws IOException {
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = null;
 
-        int[][] arr = new int[4][4];
-        List<Fish> fishes = new ArrayList<>();
+        map = new int[4][4];
+        fishes = new ArrayList<>();
+        max = -1;
 
         for (int i = 0; i < 4; i++) {
-            st = new StringTokenizer(bf.readLine());
-
+            st = new StringTokenizer(br.readLine());
             for (int j = 0; j < 4; j++) {
-                Fish f = new Fish();
-                f.index = Integer.parseInt(st.nextToken());
-                f.dir = Integer.parseInt(st.nextToken()) - 1;
-                f.x = i;
-                f.y = j;
+                int index = Integer.parseInt(st.nextToken());
+                int dir = Integer.parseInt(st.nextToken()) - 1;
 
-                fishes.add(f);
-                arr[i][j] = f.index;
+                fishes.add(new Fish(index, i, j, dir, true));
+                map[i][j] = index;
             }
         }
 
-        Collections.sort(fishes, ((o1, o2) -> Integer.compare(o1.index, o2.index)));
+        Collections.sort(fishes, (o1, o2) -> Integer.compare(o1.index, o2.index));
 
-        Fish f = fishes.get(arr[0][0] - 1);
-        Shark shark = new Shark(0, 0, f.dir, f.index);
+        Fish f = fishes.get(map[0][0] - 1);
+        s = new Shark(0, 0, f.dir, f.index);
         f.isAlive = false;
-        arr[0][0] = SHARK;
+        map[0][0] = 0;
+        dfs(s, map, fishes);
 
-        dfs(arr, shark, fishes);
-        System.out.println(maxSum);
+        System.out.println(max);
     }
 
-    private static void dfs(int[][] arr, Shark shark, List<Fish> fishes) {
-        if (maxSum < shark.eatSum) {
-            maxSum = shark.eatSum;
-        }
+    private static void dfs(Shark s, int[][] map, List<Fish> fishes) {
+        max = Math.max(max, s.eat);
 
-        fishes.forEach(f -> moveFish(f, arr, fishes));
-
-        // 상어 이동
-        for (int dist = 1; dist < 4; dist++) {
-            int nx = shark.x + dx[shark.dir] * dist;
-            int ny = shark.y + dy[shark.dir] * dist;
-
-            // 상어 이동 가능한 경우
-            if (0 <= nx && nx < 4 && 0 <= ny && ny < 4 && arr[nx][ny] > BLANK) {
-                int[][] arrCopies = copyArr(arr);
-                List<Fish> fishCopies = copyFishes(fishes);
-
-                arrCopies[shark.x][shark.y] = BLANK;
-                Fish f = fishCopies.get(arr[nx][ny] - 1);   // 상어가 먹을 물고기
-                Shark newShark = new Shark(f.x, f.y, f.dir, shark.eatSum + f.index);
-                f.isAlive = false;
-                arrCopies[f.x][f.y] = -1;
-
-                dfs(arrCopies, newShark, fishCopies);
+        // 물고기 이동
+        for (Fish f : fishes) {
+            if (!f.isAlive) {
+                continue;
             }
-        }
-    }
 
-    private static void moveFish(Fish fish, int[][] arr, List<Fish> fishes) {
-        if (fish.isAlive == false) return;
+            for (int d = 0; d < 8; d++) {
+                int nd = (f.dir + d) % 8;
+                int nx = f.x + dx[nd];
+                int ny = f.y + dy[nd];
 
-        for (int i = 0; i < 8; i++) {
-            int dir = (fish.dir + i) % 8;
-            int nx = fish.x + dx[dir];
-            int ny = fish.y + dy[dir];
-
-            if (0 <= nx && nx < 4 && 0 <= ny && ny < 4 && arr[nx][ny] > SHARK) {
-                arr[fish.x][fish.y] = BLANK;
-
-                if (arr[nx][ny] == BLANK) {
-                    fish.x = nx;
-                    fish.y = ny;
-                } else {
-                    Fish temp = fishes.get(arr[nx][ny] - 1);
-                    temp.x = fish.x;
-                    temp.y = fish.y;
-                    arr[fish.x][fish.y] = temp.index;
-
-                    fish.x = nx;
-                    fish.y = ny;
+                if (!isRange(nx, ny) || nx == s.x && ny == s.y) {
+                    continue;
                 }
 
-                arr[nx][ny] = fish.index;
-                fish.dir = dir;
-                return;
+                map[f.x][f.y] = 0;
+                if (map[nx][ny] != 0) {
+                    Fish nf = fishes.get(map[nx][ny] - 1);
+                    nf.x = f.x;
+                    nf.y = f.y;
+                    map[f.x][f.y] = nf.index;
+                }
+
+                f.x = nx;
+                f.y = ny;
+                f.dir = nd;
+                map[nx][ny] = f.index;
+                break;
             }
+        }
+
+        // 상어 이동
+        for (int i = 1; i < 4; i++) {
+            int nx = s.x + dx[s.dir] * i;
+            int ny = s.y + dy[s.dir] * i;
+
+            if (!isRange(nx, ny) || map[nx][ny] == 0) {
+                continue;
+            }
+
+            copyMap(map);
+            // 리스트 복사
+            copyFishes(fishes);
+
+            Fish target = copiedFishes.get(copiedMap[nx][ny] - 1);
+            copiedMap[nx][ny] = 0;
+            target.isAlive = false;
+            dfs(new Shark(nx, ny, target.dir, s.eat + target.index), copiedMap, copiedFishes);
         }
     }
 
-    private static int[][] copyArr(int[][] arr) {
-        int[][] temp = new int[4][4];
-
+    private static void copyMap(int[][] map) {
+        copiedMap = new int[4][4];
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                temp[i][j] = arr[i][j];
+                copiedMap[i][j] = map[i][j];
             }
         }
-
-        return temp;
     }
 
-    private static List<Fish> copyFishes(List<Fish> fishes) {
-        List<Fish> temp = new ArrayList<>();
-        fishes.forEach(e -> temp.add(new Fish(e.x, e.y, e.index, e.dir, e.isAlive)));
-        return temp;
+    private static void copyFishes(List<Fish> fishes) {
+        copiedFishes = new ArrayList<>();
+        for (Fish f : fishes) {
+            copiedFishes.add(new Fish(f.index, f.x, f.y, f.dir, f.isAlive));
+        }
+    }
+
+    private static boolean isRange(int x, int y) {
+        return x >= 0 && x < 4 && y >= 0 && y < 4;
     }
 }
