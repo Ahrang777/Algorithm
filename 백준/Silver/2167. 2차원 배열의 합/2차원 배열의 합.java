@@ -4,7 +4,7 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int N, M, K, arr[][];
+    static int N, M, K, prefixSum[][];
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
@@ -13,12 +13,12 @@ public class Main {
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
 
-        arr = new int[N + 1][M + 1];
+        prefixSum = new int[N + 1][M + 1];
 
         for (int i = 1; i <= N; i++) {
             st = new StringTokenizer(br.readLine());
             for (int j = 1; j <= M; j++) {
-                arr[i][j] = Integer.parseInt(st.nextToken());
+                prefixSum[i][j] = Integer.parseInt(st.nextToken()) + prefixSum[i][j - 1] + prefixSum[i - 1][j] - prefixSum[i - 1][j - 1];
             }
         }
 
@@ -32,13 +32,7 @@ public class Main {
             int y2 = Integer.parseInt(st.nextToken());
             int sum = 0;
 
-            for (int x = x1; x <= x2; x++) {
-                for (int y = y1; y <= y2; y++) {
-                    sum += arr[x][y];
-                }
-            }
-
-            sb.append(sum).append("\n");
+            sb.append(prefixSum[x2][y2] - prefixSum[x1 - 1][y2] - prefixSum[x2][y1 - 1] + prefixSum[x1 - 1][y1 - 1]).append("\n");
         }
 
         System.out.println(sb);
