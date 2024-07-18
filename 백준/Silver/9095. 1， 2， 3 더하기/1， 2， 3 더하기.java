@@ -3,6 +3,7 @@ import java.util.*;
 
 public class Main {
     static int T, N;
+
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringBuilder sb = new StringBuilder();
@@ -13,28 +14,28 @@ public class Main {
             N = Integer.parseInt(br.readLine());
 
             int[] dp = new int[N + 1];
+
+            if (N == 1) {
+                sb.append(1).append("\n");
+                continue;
+            }
             dp[1] = 1;
 
+            if (N == 2) {
+                sb.append(2).append("\n");
+                continue;
+            }
+
+            if (N == 3) {
+                sb.append(4).append("\n");
+                continue;
+            }
+            dp[2] = 2;
+            dp[3] = 4;
+
             // 1 >> + 1, + 2, + 3
-            for (int i = 2; i <= N; i++) {
-
-                // + 1
-                dp[i] += dp[i - 1];
-
-                // + 2
-                if (i > 2) {
-                    dp[i] += dp[i - 2];
-                }
-
-                // + 3
-                if (i > 3) {
-                    dp[i] += dp[i - 3];
-                }
-
-                // 2, 3인 경우
-                if (i == 2 || i == 3) {
-                    dp[i]++;
-                }
+            for (int i = 4; i <= N; i++) {
+                dp[i] = dp[i - 1] + dp[i - 2] + dp[i - 3];
             }
 
             sb.append(dp[N]).append("\n");
