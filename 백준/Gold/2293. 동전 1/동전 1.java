@@ -16,8 +16,10 @@ public class Main {
 
         int[] arr = new int[N + 1];
         int[] dp = new int[K + 1];
-        dp[0] = 1;
-
+        
+        // 1원을 이용한 dp[1]같은 처음 나오는 동전 이용한 경우의 수 구하기 위해
+        dp[0] = 1; 
+        
         for (int i = 1; i <= N; i++) {
             arr[i] = Integer.parseInt(br.readLine());
 
