@@ -49,16 +49,11 @@ public class Main {
 
         dijkstra(1);
 
-        int cnt = 0;
+        sb.append(N - 1).append("\n");
         for (int i = 2; i <= N; i++) {
-            //if (links[i] == 0) {
-            //    continue;
-            //}
-            cnt++;
             sb.append(links[i]).append(" ").append(i).append("\n");
         }
 
-        System.out.println(cnt);
         System.out.println(sb);
     }
 
