@@ -51,9 +51,9 @@ public class Main {
 
         int cnt = 0;
         for (int i = 2; i <= N; i++) {
-            if (links[i] == 0) {
-                continue;
-            }
+            //if (links[i] == 0) {
+            //    continue;
+            //}
             cnt++;
             sb.append(links[i]).append(" ").append(i).append("\n");
         }
