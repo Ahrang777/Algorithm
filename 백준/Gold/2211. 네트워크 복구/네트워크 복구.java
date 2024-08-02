@@ -1,79 +1,88 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 
 public class Main {
-    public static int n, m;
-    public static int[] distance, connect;
-    public static int INF = (int)1e9;
-    public static class Edge implements Comparable<Edge>{
-        int a;
-        int dis;
-        public Edge(int a, int dis){
-            this.a = a;
-            this.dis = dis;
+    static class Node implements Comparable<Node> {
+        int index, dist;
+
+        public Node(int index, int dist) {
+            this.index = index;
+            this.dist = dist;
         }
 
         @Override
-        public int compareTo(Edge o) {
-            return this.dis - o.dis;
+        public int compareTo(Node o) {
+            return Integer.compare(this.dist, o.dist);
         }
     }
-
-    public static ArrayList<Edge>[] list;
-    public static int cnt;
+    static int N, M;
+    static List<Node>[] graph;
+    static int[] d, links;
+    static final int INF = (int) 1e9;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+        StringTokenizer st = new StringTokenizer(br.readLine());
         StringBuilder sb = new StringBuilder();
-        n = Integer.parseInt(st.nextToken());
-        m = Integer.parseInt(st.nextToken());
 
-        list = new ArrayList[n+1];
-        distance = new int[n+1];
-        connect = new int[n+1];
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
 
-        for(int i=0;i<n+1;i++){
-            list[i] = new ArrayList<Edge>();
+        graph = new List[N + 1];
+        d = new int[N + 1];
+        links = new int[N + 1];
+
+        Arrays.fill(d, INF);
+        for (int i = 1; i <= N; i++) {
+            graph[i] = new ArrayList<>();
         }
 
-        for(int i=0;i<m;i++){
-            st = new StringTokenizer(br.readLine(), " ");
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            int dis = Integer.parseInt(st.nextToken());
+        for (int i = 0; i < M; i++) {
+            st = new StringTokenizer(br.readLine());
 
-            list[a].add(new Edge(b, dis));
-            list[b].add(new Edge(a, dis));
+            int A = Integer.parseInt(st.nextToken());
+            int B = Integer.parseInt(st.nextToken());
+            int C = Integer.parseInt(st.nextToken());
+
+            graph[A].add(new Node(B, C));
+            graph[B].add(new Node(A, C));
         }
 
-        Arrays.fill(distance, INF);
-        dijkstra();
+        dijkstra(1);
 
-        for(int i=2;i<=n;i++){
-            if(connect[i] == 0) continue;
+        int cnt = 0;
+        for (int i = 2; i <= N; i++) {
+            if (links[i] == 0) {
+                continue;
+            }
             cnt++;
-            sb.append(i+ " " + connect[i]+"\n");
+            sb.append(links[i]).append(" ").append(i).append("\n");
         }
+
         System.out.println(cnt);
-        System.out.println(sb.toString());
+        System.out.println(sb);
     }
 
-    public static void dijkstra(){
-        distance[1] = 0;
-        PriorityQueue<Edge> pq = new PriorityQueue<>();
-        pq.add(new Edge(1, 0));
-        while (!pq.isEmpty()){
-            Edge edge = pq.poll();
+    private static void dijkstra(int start) {
+        PriorityQueue<Node> pq = new PriorityQueue<>();
+        pq.offer(new Node(start, 0));
+        d[start] = 0;
 
-            if(edge.dis > distance[edge.a]) continue;
+        while (!pq.isEmpty()) {
+            Node node = pq.poll();
+            int now = node.index;
+            int dist = node.dist;
 
-            for(Edge e:list[edge.a]){
-                if(distance[e.a] > e.dis + edge.dis){
-                    distance[e.a]  = e.dis + edge.dis;
-                    connect[e.a] = edge.a;
-                    pq.add(new Edge(e.a, distance[e.a]));
+            if (d[now] < dist) {
+                continue;
+            }
+
+            for (Node next : graph[now]) {
+                int cost = d[now] + next.dist;
+
+                if (cost < d[next.index]) {
+                    pq.offer(new Node(next.index, cost));
+                    d[next.index] = cost;
+                    links[next.index] = now;
                 }
             }
         }
