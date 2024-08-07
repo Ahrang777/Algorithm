@@ -50,8 +50,7 @@ public class Main {
             }
 
             if (map[nx][ny] > map[x][y]) {
-                dp[x][y] = Math.max(dp[x][y], dfs(nx, ny) + 1);
-                dfs(nx, ny);
+                dp[x][y] = Math.max(dp[x][y], dfs(nx, ny) + 1);                
             }
         }
 
