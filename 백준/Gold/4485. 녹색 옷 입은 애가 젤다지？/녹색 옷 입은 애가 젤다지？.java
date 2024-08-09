@@ -1,90 +1,95 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.PriorityQueue;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
-/**
- * https://www.acmicpc.net/problem/4485
- * @author SSAFY
- *
- */
 public class Main {
-	static class Node implements Comparable<Node> {
-		int x, y, dist;
+    static class Node {
+        int x, y, dist;
 
-		public Node(int x, int y, int dist) {
-			this.x = x;
-			this.y = y;
-			this.dist = dist;
-		}
+        public Node(int x, int y, int dist) {
+            this.x = x;
+            this.y = y;
+            this.dist = dist;
+        }
+    }
+    static int N, min;
+    static int[][] map, d;
+    static int[] dx = {-1, 0, 1, 0};
+    static int[] dy = {0, 1, 0, -1};
+    static final int INF = (int) 1e9;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = null;
+        StringBuilder sb = new StringBuilder();
 
-		@Override
-		public int compareTo(Node o) {
-			return Integer.compare(this.dist, o.dist);
-		}
-	}
+        for (int tc = 1;; tc++) {
+            N = Integer.parseInt(br.readLine());
 
-	static int N, map[][], d[][], result;
-	static final int INF = Integer.MAX_VALUE;
-	static int[] dx = {-1, 0, 1, 0};
-	static int[] dy = {0, -1, 0, 1};
+            if (N == 0) {
+                break;
+            }
 
-	public static void main(String[] args) throws Exception {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = null;
-		StringBuilder sb = new StringBuilder();
-		int idx = 1;
+            min = Integer.MAX_VALUE;
+            map = new int[N][N];
+            d = new int[N][N];
 
-		while ((N = Integer.parseInt(br.readLine())) != 0) {
-			map = new int[N][N];
-			d = new int[N][N];
+            for (int i = 0; i < N; i++) {
+                Arrays.fill(d[i], INF);
+            }
 
-			for (int i = 0; i < N; i++) {
-				st = new StringTokenizer(br.readLine());
-				for (int j = 0; j < N; j++) {
-					map[i][j] = Integer.parseInt(st.nextToken());
-					d[i][j] = INF;
-				}
-			}
+            for (int i = 0; i < N; i++) {
+                st = new StringTokenizer(br.readLine());
+                for (int j = 0; j < N; j++) {
+                    map[i][j] = Integer.parseInt(st.nextToken());
+                }
+            }
 
-			dijkstra(0, 0);
+            dijkstra();
 
-			sb.append("Problem ").append(idx++).append(": ").append(d[N - 1][N - 1]).append("\n");
-		}
+            sb.append("Problem ").append(tc).append(": ");
+            sb.append(min).append("\n");
+        }
 
-		System.out.println(sb);
-	}
+        System.out.println(sb);
+    }
 
-	private static void dijkstra(int x, int y) {
-		PriorityQueue<Node> pq = new PriorityQueue<>();
-		pq.offer(new Node(x, y, map[x][y]));
-		d[x][y] = map[x][y];
+    private static void dijkstra() {
+        PriorityQueue<Node> pq = new PriorityQueue<>((o1, o2) -> Integer.compare(o1.dist, o2.dist));
+        pq.offer(new Node(0, 0, map[0][0]));
+        d[0][0] = map[0][0];
 
-		while (!pq.isEmpty()) {
-			Node node = pq.poll();
-			int curX = node.x;
-			int curY = node.y;
-			int dist = node.dist;
+        while (!pq.isEmpty()) {
+            Node node = pq.poll();
+            int x = node.x, y = node.y;
+            int dist = node.dist;
 
-			if (d[curX][curY] < dist) continue;
+            if (x == N - 1 && y == N - 1) {
+                min = Math.min(min, dist);
+                return;
+            }
 
-			for (int i = 0; i < 4; i++) {
-				int nx = curX + dx[i];
-				int ny = curY + dy[i];
+            if (d[x][y] < dist) {
+                continue;
+            }
 
-				if (!isRange(nx, ny))	continue;
+            for (int i = 0; i < 4; i++) {
+                int nx = x + dx[i];
+                int ny = y + dy[i];
 
-				int cost = d[curX][curY] + map[nx][ny];
+                if (!isRange(nx, ny)) {
+                    continue;
+                }
 
-				if (cost < d[nx][ny]) {
-					d[nx][ny] = cost;
-					pq.offer(new Node(nx, ny, cost));
-				}
-			}
-		}
-	}
+                int cost = d[x][y] + map[nx][ny];
+                if (cost < d[nx][ny]) {
+                    d[nx][ny] = cost;
+                    pq.offer(new Node(nx, ny, cost));
+                }
+            }
+        }
 
-	private static boolean isRange(int x, int y) {
-		return x >= 0 && x < N && y >= 0 && y < N;
-	}
+    }
+
+    private static boolean isRange(int x, int y) {
+        return x >= 0 && x < N && y >= 0 && y < N;
+    }
 }
