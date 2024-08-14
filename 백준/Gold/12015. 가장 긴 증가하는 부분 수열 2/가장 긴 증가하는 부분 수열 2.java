@@ -26,14 +26,18 @@ public class Main {
                 continue;
             }
 
-            int index = upperBound(arr[i], 0, len);
+            // lowerBound를 이용해서 index를 찾아야 한다. 
+            // 1, 2, 6, 2, 6, 4, 5
+            // upperBound로 index를 찾는 경우 
+            // 1, 2, 6 -> 1, 2, 2 -> 1, 2, 2, 6 이 되며 이상해진다.
+            int index = lowerBound(arr[i], 0, len);
             dp[index] = arr[i];
         }
 
         System.out.println(len);
     }
 
-    private static int upperBound(int key, int left, int right) {
+    private static int lowerBound(int key, int left, int right) {
         while (left < right) {
             int mid = (left + right) / 2;
 
