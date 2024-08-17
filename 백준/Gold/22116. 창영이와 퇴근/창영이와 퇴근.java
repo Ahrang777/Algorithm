@@ -2,15 +2,21 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static class Node {
-        int x, y;
+    static class Node implements Comparable<Node>{
+        int x, y, dist;
 
-        public Node(int x, int y) {
+        public Node(int x, int y, int dist) {
             this.x = x;
             this.y = y;
+            this.dist = dist;
+        }
+
+        @Override
+        public int compareTo(Node node) {
+            return Integer.compare(this.dist, node.dist);
         }
     }
-    static int N;
+    static int N, answer;
     static int[][] map;
     static int[] dx = {-1, 0, 1, 0};
     static int[] dy = {0, 1, 0, -1};
@@ -29,53 +35,40 @@ public class Main {
             }
         }
 
-        int s = 0;
-        int e = (int) 1e9;
-        int answer = e;
-
-        while (s <= e) {
-            // 최대 경사
-            int mid = (s + e) / 2;
-
-            if (isValid(mid)) { // 최대경사 mid일 경우 N, N에 도달할 수 있는지 여부
-                e = mid - 1;
-                answer = Math.min(answer, mid);
-            } else {
-                s = mid + 1;
-            }
-        }
+        bfs();
 
         System.out.println(answer);
     }
 
-    private static boolean isValid(int max) {
-        Queue<Node> q = new ArrayDeque<>();
+    private static void bfs() {
+        PriorityQueue<Node> pq = new PriorityQueue<>();
         boolean[][] visited = new boolean[N][N];
-        q.offer(new Node(0, 0));
-        visited[0][0] = true;
+        pq.offer(new Node(0, 0, 0));
 
-        while (!q.isEmpty()) {
-            Node now = q.poll();
-            int x = now.x, y = now.y;
-
+        while (!pq.isEmpty()) {
+            // 최소 경사를 뽑고 해당 위치 방문처리 
+            // >> 애초에 넣을 때부터 방문안 한것만 넣기에 그냥 방문처리하면됨
+            // 매번 경사 최댓값 갱신
+            // 도착지점에 도착하면 종료
+            Node now = pq.poll();
+            int x = now.x, y = now.y, dist = now.dist;
+            visited[x][y] = true;
+            answer = Math.max(answer, dist);
             if (x == N - 1 && y == N - 1) {
-                return true;
+                return;
             }
 
             for (int i = 0; i < 4; i++) {
                 int nx = x + dx[i];
                 int ny = y + dy[i];
 
-                if (!isRange(nx, ny) || visited[nx][ny] || Math.abs(map[nx][ny] - map[x][y]) > max) {
+                if (!isRange(nx, ny) || visited[nx][ny]) {
                     continue;
                 }
 
-                visited[nx][ny] = true;
-                q.offer(new Node(nx, ny));
+                pq.offer(new Node(nx, ny, Math.abs(map[nx][ny] - map[x][y])));
             }
         }
-
-        return false;
     }
 
     private static boolean isRange(int x, int y) {
