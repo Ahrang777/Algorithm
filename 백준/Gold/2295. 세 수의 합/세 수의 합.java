@@ -2,50 +2,45 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static int N;
-    static int[] arr, twoSum;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        N = Integer.parseInt(br.readLine());
-        arr = new int[N];
-        twoSum = new int[N * (N + 1) / 2];
-
+        // get input
+        int N = Integer.parseInt(br.readLine());
+        long[] arr = new long[N];
         for (int i = 0; i < N; i++) {
-            arr[i] = Integer.parseInt(br.readLine());
+            arr[i] = Long.parseLong(br.readLine());
         }
 
-        int index = 0;
-        for (int i = 0; i < N; i++) {
-            for (int j = i; j < N; j++) {
-                twoSum[index++] = arr[i] + arr[j];
-            }
-        }
+        // process
+        // x와 z로 만들 수 있는 모든 합을 생성한다
+        // 합을 정렬한 후 그 합과 y값을 이용해서 arr[i]값을 만들 수 있는지 확인
+        // 확인하는 과정은 이분탐색을 이용
+        Arrays.sort(arr);
+        for (int k = arr.length - 1; k >= 0; k--) {
+            for (int z = k-1; z >= 0; z--) {
+                int x = 0;
 
-        Arrays.sort(twoSum);
-        int answer = 0;
-
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                int s = 0;
-                int e = twoSum.length - 1;
-                int target = arr[i] - arr[j];
-
-                while (s <= e) {
-                    int mid = (s + e) / 2;
-
-                    if (target == twoSum[mid]) {
-                        answer = Math.max(twoSum[mid] + arr[j], answer);
+                while (x <= z) {
+                    if (arr[x] + arr[z] >= arr[k]) {
                         break;
-                    } else if (target > twoSum[mid]) {
-                        s = mid + 1;
+                    }
+
+                    // 값 찾기
+                    // 만족하는 y값이 없으면 x 증가
+                    // 배열, from, to, target
+                    // 배열의 from <= < to 에서 target 존재하면 해당 index, 없으면 음수
+                    int bs = Arrays.binarySearch(arr, x, z + 1, arr[k] - (arr[x] + arr[z]));
+                    if (bs >= 0) {
+                        System.out.println(arr[k]);
+                        System.exit(0);
                     } else {
-                        e = mid - 1;
+                        x++;
                     }
                 }
-            }
-        }
 
-        System.out.println(answer);
+            }
+
+        }
     }
 }
