@@ -1,95 +1,101 @@
 import java.util.*;
 
 class Solution {
-    private int n;
-    private List<int[]> diceComb = new ArrayList<>();
-
+    int N;
+    List<int[]> diceComb = new ArrayList<>();
     public int[] solution(int[][] dice) {
-        this.n = dice.length;
-        combineDice(0, 0, new int[n / 2]); // (1)
-
         int[] answer = {};
-        int maxWinCnt = 0;
-        for (int[] aComb : diceComb) {
-            List<Integer> aScores = new ArrayList<>();
-            combineScores(0, 0, aComb, aScores, dice); // (2)
-            Collections.sort(aScores);
-
-            int[] bComb = getBComb(aComb);
-            List<Integer> bScores = new ArrayList<>();
-            combineScores(0, 0, bComb, bScores, dice); // (3)
-            Collections.sort(bScores);
-
-            int winCnt = getWinCntOfA(aScores, bScores); // (4)
-            if (maxWinCnt < winCnt) {
-                maxWinCnt = winCnt;
-                answer = aComb;
+        int winMax = 0;
+        
+        N = dice.length;
+        diceCombination(0, 0, new int[N / 2]);
+        
+        for (int[] diceA : diceComb) {
+            List<Integer> scoresA = new ArrayList<>();
+            scoreCombination(0, 0, dice, diceA, scoresA);
+            Collections.sort(scoresA);
+            
+            int[] diceB = getDiceB(diceA);
+            List<Integer> scoresB = new ArrayList<>();
+            scoreCombination(0, 0, dice, diceB, scoresB);
+            Collections.sort(scoresB);
+            
+            int winCnt = getWinCnt(scoresA, scoresB);
+            
+            if (winCnt > winMax) {
+                winMax = winCnt;
+                answer = diceA;
             }
         }
-
-        for (int i = 0; i < answer.length; i++) {
-            answer[i]++; // (5)
+        
+        for (int i = 0; i < N / 2; i++) {
+            answer[i]++;
         }
+        
         return answer;
     }
-
-    private void combineDice(int start, int cnt, int[] numbers) { 
-        if (cnt == n / 2) { // (6)
-            diceComb.add(numbers.clone());
-            return;
-        }
-
-        for (int i = start; i < n; i++) {
-            numbers[cnt] = i;
-            combineDice(i + 1, cnt + 1, numbers);
-        }
-    }
-
-    private int[] getBComb(int[] aComb) { // (7)
-        boolean[] isA = new boolean[n];
-        for (int num : aComb) {
-            isA[num] = true; // (8)
-        }
-
-        int b = 0;
-        int[] bComb = new int[n / 2];
-        for (int i = 0; i < n; i++) {
-            if (!isA[i]) {
-                bComb[b] = i;
-                b++;
+    
+    private int getWinCnt(List<Integer> scoresA, List<Integer> scoresB) {
+        int total = 0;
+        
+        for (int score : scoresA) {
+            int s = 0;
+            int e = scoresB.size() - 1;
+            
+            while (s <= e) {
+                int mid = (s + e) / 2;
+                
+                if (score > scoresB.get(mid)) {
+                    s = mid + 1;
+                } else {
+                    e = mid - 1;
+                }
             }
+            
+            total += s;
         }
-
-        return bComb;
+        
+        return total;
     }
-
-    private void combineScores(int cnt, int sum, int[] comb, List<Integer> scores, int[][] dice) {
-        if (cnt == n / 2) { // (9)
+    
+    private int[] getDiceB(int[] otherDice) {
+        int[] dices = new int[N / 2];
+        boolean[] isSelected = new boolean[N];
+        
+        for (int o : otherDice) {
+            isSelected[o] = true;
+        }
+        
+        int index = 0;
+        for (int i = 0; i < N; i++) {
+            if (isSelected[i]) continue;
+            
+            dices[index++] = i;
+        }
+        
+        return dices;
+    }
+    
+    private void scoreCombination(int cnt, int sum, int[][] dice, int[] diceComb, List<Integer> scores) {
+        if (cnt == N / 2) {
             scores.add(sum);
             return;
         }
-
+        
         for (int i = 0; i < 6; i++) {
-            combineScores(cnt + 1, sum + dice[comb[cnt]][i], comb, scores, dice);
+            scoreCombination(cnt + 1, sum + dice[diceComb[cnt]][i], dice, diceComb, scores);
         }
     }
-
-    private int getWinCntOfA(List<Integer> aScores, List<Integer> bScores) {
-        int winCnt = 0;
-        for (int s : aScores) { // (10)
-            int start = 0;
-            int end = bScores.size() - 1;
-            while (start <= end) {
-                int mid = (start + end) / 2;
-
-                if (s > bScores.get(mid)) {
-                    start = mid + 1;
-                } else {
-                    end = mid - 1;
-                }
-            }
-            winCnt += start;
+    
+    private void diceCombination(int cnt, int start, int[] numbers) {
+        if (cnt == N / 2) {
+            diceComb.add(numbers.clone());
+            return;
         }
-        return winCnt;
+        
+        for (int i = start; i < N; i++) {
+            numbers[cnt] = i;
+            diceCombination(cnt + 1, i + 1, numbers);
+        }
     }
 }
