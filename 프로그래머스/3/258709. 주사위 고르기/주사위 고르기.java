@@ -39,16 +39,34 @@ class Solution {
         int total = 0;
         
         for (int score : scoresA) {
-            int s = 0;
-            int e = scoresB.size() - 1;
+//             int s = 0;
+//             int e = scoresB.size() - 1;
             
-            while (s <= e) {
+//             while (s <= e) {
+//                 int mid = (s + e) / 2;
+                
+//                 if (score > scoresB.get(mid)) {
+//                     s = mid + 1;
+//                 } else {
+//                     e = mid - 1;
+//                 }
+//             }
+            
+//             total += s;
+            
+            // lowerBound 처리 A 점수보다 처음 같거나 큰 값의 위치 index를 구한다.
+            // 0 ~ index - 1 까지가 A가 이기는 경우이다.
+            // index - 1 - 0 + 1 = index 개가 이기는 경우이다. 
+            int s = 0;
+            int e = scoresB.size();
+            
+            while (s < e) {
                 int mid = (s + e) / 2;
                 
-                if (score > scoresB.get(mid)) {
-                    s = mid + 1;
+                if (score <= scoresB.get(mid)) {
+                    e = mid;                
                 } else {
-                    e = mid - 1;
+                    s = mid + 1;
                 }
             }
             
