@@ -1,68 +1,46 @@
-import java.util.*;
 class Solution {
-    static class Box {
-        int len, cnt;
-        
-        public Box (int len, int cnt) {
-            this.len = len;
-            this.cnt = cnt;
-        }
-    }
-    static int N;
     public long solution(int cap, int n, int[] deliveries, int[] pickups) {
         long answer = 0;
-        N = n;
         
-        // 거리가 먼 순서대로 들어있음
-        Deque<Box> dq = new ArrayDeque<>(); // 배달
-        Deque<Box> pq = new ArrayDeque<>();; // 수거
+        int indexD = n - 1;
+        int indexP = n - 1;
         
-        for (int i = N - 1; i >= 0; i--) {
-            if (deliveries[i] > 0) {
-                dq.offerLast(new Box(i + 1, deliveries[i]));
+        while (indexD >= 0 || indexP >= 0) {
+            
+            // 제일 먼 배송지점 구하기 
+            while (indexD >= 0 && deliveries[indexD] == 0) indexD--;
+            
+            // 제일 먼 수거지점 구하기
+            while (indexP >= 0 && pickups[indexP] == 0) indexP--;
+            
+            // 배송할 박스의 개수, 수거할 박스의 개수 
+            int sum = 0;
+            
+            // 배송 지점, 수거 지점 중 더 먼곳으로 이동 
+            // 가는 길에 배송하거나 오는 길에 수거
+            answer += (Math.max(indexD, indexP) + 1) * 2;
+            
+            // 배송처리 
+            while (indexD >= 0 && sum < cap) {
+                sum += deliveries[indexD];
+                deliveries[indexD--] = 0;
+            }
+                        
+            if (sum > cap) {
+                deliveries[++indexD] = sum - cap;
             }
             
-            if (pickups[i] > 0) {
-                pq.offerLast(new Box(i + 1, pickups[i]));
-            }
-        }
-        
-        while (!dq.isEmpty() || !pq.isEmpty()) {
-            int dLen = dq.isEmpty() ? 0 : dq.peek().len;
-            int pLen = pq.isEmpty() ? 0 : pq.peek().len;
-            
-            // 트럭에 실어 출발할 상자의 개수 
-            // 상자 배달
-            int dCnt = 0;
-            while (!dq.isEmpty() && dCnt < cap) {
-                Box d = dq.pollFirst();
-                
-                int needCnt = cap - dCnt;
-                if (d.cnt > needCnt) {
-                    d.cnt -= needCnt;
-                    dq.offerFirst(d);
-                    dCnt = cap;
-                } else {
-                    dCnt += d.cnt;
-                }
+            sum = 0;
+
+            // 수거처리
+            while (indexP >= 0 && sum < cap) {
+                sum += pickups[indexP];
+                pickups[indexP--] = 0;
             }
             
-            // 상자 수거 
-            int pCnt = 0;
-            while (!pq.isEmpty() && pCnt < cap) {
-                Box p = pq.pollFirst();
-                
-                int needCnt = cap - pCnt;
-                if (p.cnt > needCnt) {
-                    p.cnt -= needCnt;
-                    pq.offerFirst(p);
-                    pCnt = cap;
-                } else {
-                    pCnt += p.cnt;
-                }
+            if (sum > cap) {
+                pickups[++indexP] = sum - cap;
             }
-            
-            answer += 2 * Math.max(dLen, pLen);
         }
         
         return answer;
