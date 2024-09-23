@@ -44,7 +44,7 @@ class Solution {
         int e = N;  // q2 시작점
         long sum = sum1; // q1의 원소 합계
         
-        while (s != e) {
+        while (s < e) {
             if (sum == total) {
                 break;
             }
@@ -54,10 +54,11 @@ class Solution {
                 break;
             }
             
+            // q1 -> q2
             if (sum > total) {
                 sum -= arr[s];
                 s++;
-            } else if (sum < total) {
+            } else if (sum < total) { // q2 -> q1
                 sum += arr[e];
                 e++;
             } 
