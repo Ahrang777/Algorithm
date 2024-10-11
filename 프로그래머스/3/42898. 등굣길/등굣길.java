@@ -12,13 +12,16 @@ class Solution {
         
         for (int x = 1; x <= n; x++) {
             for (int y = 1; y <= m; y++) {
-                if (dp[x][y] != -1) {
-                    dp[x][y] += (Math.max(dp[x - 1][y], 0) + Math.max(dp[x][y - 1], 0));
-                    dp[x][y] %= DIV;
+                if (dp[x][y] == -1) {
+                    dp[x][y] = 0;
+                    continue;
                 }
+                
+                if (x != 1) dp[x][y] += dp[x - 1][y] % DIV;
+                if (y != 1) dp[x][y] += dp[x][y - 1] % DIV;
             }
         }
         
-        return dp[n][m];
+        return dp[n][m] % DIV;
     }
 }
