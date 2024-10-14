@@ -1,21 +1,23 @@
 class Solution {
     public int solution(int[] money) {
-        int[] dp_first = new int[money.length];
-        int[] dp_second = new int[money.length];
+        int N = money.length;
+        // N - 2, N - 1, 0, 1 집이 연결되어 있다. 
+        // 단순 i - 1, i - 2 비교로는 마지막에 문제 >> 0번째 집 선택한 경우, 선택 안 한 경우로 구분?
         
-        for(int i = 0; i < money.length; i++) {
-            dp_first[i] = money[i];
-            dp_second[i] = money[i];
+        // 0: 0번 포함, 1: 0번째 건너뛰고 1번 부터 포함
+        int[][] dp = new int[2][N];
+        
+        dp[0][0] = dp[0][1] = money[0];
+        dp[1][1] = money[1];
+        
+        for (int i = 2; i < N - 1; i++) {
+            dp[0][i] = Math.max(dp[0][i - 1], dp[0][i - 2] + money[i]);
+            dp[1][i] = Math.max(dp[1][i - 1], dp[1][i - 2] + money[i]);
         }
-        dp_first[1] = -1;
-        dp_second[0] = -1;
-        dp_first[2] += dp_first[0];
-        for (int i = 3; i < money.length; i++) {
-            dp_first[i] += Math.max(dp_first[i - 2], dp_first[i - 3]);
-            dp_second[i] += Math.max(dp_second[i - 2], dp_second[i - 3]);
-        }
-        int first_max = Math.max(dp_first[money.length - 2], dp_first[money.length - 3]);
-        int second_max = Math.max(dp_second[money.length - 1], dp_second[money.length - 2]);
-        return Math.max(first_max, second_max);
+        
+        dp[0][N - 1] = dp[0][N - 2];
+        dp[1][N - 1] = Math.max(dp[1][N - 2], dp[1][N - 3] + money[N - 1]);
+        
+        return Math.max(dp[0][N - 1], dp[1][N - 1]);
     }
 }
