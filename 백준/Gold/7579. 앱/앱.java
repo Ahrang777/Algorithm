@@ -26,17 +26,13 @@ public class Main {
         st = new StringTokenizer(br.readLine());
         for (int i = 0; i < N; i++) {
             costs[i] = Integer.parseInt(st.nextToken());
-        }
-
-        Arrays.fill(dp, -1);
+        } 
 
         for (int i = 0; i < N; i++) {
             int cost = costs[i];
 
             for (int j = 10000; j >= cost; j--) {
-                if (dp[j - cost] != -1) {
-                    dp[j] = Math.max(dp[j], dp[j - cost] + memories[i]);
-                }
+                dp[j] = Math.max(dp[j], dp[j - cost] + memories[i]);
             }
 
             dp[cost] = Math.max(dp[cost], memories[i]);
