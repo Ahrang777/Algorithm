@@ -46,6 +46,7 @@ public class Main {
     }
 
     private static void subset(int cnt, int p, int f, int s, int v, int c) {
+        // 최소 비용 찾는 것이고 굳이 끝까지 확인 안해도 중간에 최저기준 다 충족하고 비용이 더 작으면 갱신할 수 있다. 
         if (p >= MP && f >= MF && s >= MS && v >= MV && c < answer) {
             results.clear();
             for (int i = 1; i <= N; i++) {
