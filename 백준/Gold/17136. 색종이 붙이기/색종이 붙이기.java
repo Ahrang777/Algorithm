@@ -1,96 +1,104 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.StringTokenizer;
- 
+import java.io.*;
+import java.util.*;
+
 public class Main {
+    static int answer = Integer.MAX_VALUE;
     static int[][] map;
-    static int[] paper = { 0, 5, 5, 5, 5, 5 };
-    static int ans = Integer.MAX_VALUE;
- 
-    public static void main(String[] args) throws Exception {
+    static int[] paper = {0, 5, 5, 5, 5, 5};
+
+    static final int N = 10;
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        StringTokenizer st;
- 
-        map = new int[10][10];
-        for (int i = 0; i < map.length; i++) {
+        StringTokenizer st = null;
+
+        int size = 0;
+        map = new int[N][N];
+
+        for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < map[i].length; j++) {
+            for (int j = 0; j < N; j++) {
                 map[i][j] = Integer.parseInt(st.nextToken());
+
+                if (map[i][j] == 1) {
+                    size++;
+                }
             }
         }
- 
-        DFS(0, 0, 0);
- 
-        if (ans == Integer.MAX_VALUE) {
-            ans = -1;
+
+        if (size == 0) {
+            System.out.println(0);
+            return;
+        } else if (size == N * N) {
+            System.out.println(4);
+            return;
         }
- 
-        bw.write(ans + "\n");
-        bw.close();
-        br.close();
+
+        dfs(0, 0);
+
+        System.out.println(answer == Integer.MAX_VALUE ? -1 : answer);
     }
-    
-    // DFS + 백트래킹
-    public static void DFS(int x, int y, int cnt) {
-        // 맨 끝점에 도달하였을 경우, ans와 cnt 비교하고 종료.
-        if (x >= 9 && y > 9) {
-            ans = Math.min(ans, cnt);
+
+
+    private static void dfs(int cnt, int index) {
+        if (index >= 100) {
+            answer = Math.min(answer, cnt);
             return;
         }
- 
-        // 최솟값을 구해야하는데 ans보다 cnt가 커지는 순간
-        // 더 이상 탐색할 필요가 없어짐.
-        if (ans <= cnt) {
+
+        if (cnt >= answer) {
             return;
         }
- 
-        // 아래 줄로 이동.
-        if (y > 9) {
-            DFS(x + 1, 0, cnt);
-            return;
-        }
- 
+
+        int x = index / N, y = index % N;
+
         if (map[x][y] == 1) {
-            for (int i = 5; i >= 1; i--) {
-                if (paper[i] > 0 && isAttach(x, y, i)) {
-                    attach(x, y, i, 0); // 색종이를 붙임.
-                    paper[i]--;
-                    DFS(x, y + 1, cnt + 1);
-                    attach(x, y, i, 1); // 색종이를 다시 뗌.
-                    paper[i]++;
+            // 색종이 길이
+            for (int len = 5; len >= 1; len--) {
+                // 색종이 붙일 수 있는 경우
+                if (paper[len] > 0 && isAttach(x, y, len)) {
+                    // 색종이 붙이기
+                    attach(x, y, len, 0);
+                    paper[len]--;
+
+                    dfs(cnt + 1, index + 1);
+
+                    // 색종이 제거
+                    paper[len]++;
+                    attach(x, y, len, 1);
                 }
             }
-        } else { // 오른쪽으로 이동.
-            DFS(x, y + 1, cnt);
+        } else {
+            dfs(cnt, index + 1);
         }
     }
- 
-    // 색종이를 붙이는 함수.
-    public static void attach(int x, int y, int size, int state) {
-        for (int i = x; i < x + size; i++) {
-            for (int j = y; j < y + size; j++) {
-                map[i][j] = state;
+
+    private static void attach(int sx, int sy, int len, int state) {
+        for (int x = sx; x < sx + len; x++) {
+            for (int y = sy; y < sy + len; y++) {
+                map[x][y] = state;
             }
         }
     }
- 
-    // 색종이를 붙일 수 있는지 확인.
-    public static boolean isAttach(int x, int y, int size) {
-        for (int i = x; i < x + size; i++) {
-            for (int j = y; j < y + size; j++) {
-                if (i < 0 || i >= 10 || j < 0 || j >= 10) {
-                    return false;
-                }
- 
-                if (map[i][j] != 1) {
+
+    // 색종이 붙일 수 있는지 확인
+    private static boolean isAttach(int sx, int sy, int len) {
+        // 색종이가 범위 초과
+        if (!isRange(sx + len - 1, sy + len - 1)) {
+            return false;
+        }
+
+        for (int x = sx; x < sx + len; x++) {
+            for (int y = sy; y < sy + len; y++) {
+                if (map[x][y] != 1) {
                     return false;
                 }
             }
         }
+
         return true;
     }
- 
+
+    private static boolean isRange(int x, int y) {
+        return x >= 0 && x < N && y >= 0 && y < N;
+    }
 }
