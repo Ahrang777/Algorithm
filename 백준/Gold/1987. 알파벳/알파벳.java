@@ -32,6 +32,8 @@ public class Main {
     }
 
     private static void dfs(int x, int y, int total) {
+        if (max == 26) return;
+        
         for (int i = 0; i < 4; i++) {
             int nx = x + dx[i];
             int ny = y + dy[i];
