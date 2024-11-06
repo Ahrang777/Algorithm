@@ -2,12 +2,10 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static int N, M, H;
+    static int N, M, H, answer = -1;
     static int[][] isSelected;
-    static int result = -1;
     static final int RIGHT = 1;
     static final int LEFT = -1;
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
@@ -20,21 +18,24 @@ public class Main {
 
         for (int i = 0; i < M; i++) {
             st = new StringTokenizer(br.readLine());
+
             int a = Integer.parseInt(st.nextToken()) - 1;
             int b = Integer.parseInt(st.nextToken()) - 1;
 
+            // a행 b ~ b+1 열 사이 가로선
+            // 1: 오른쪽으로 가로선, -1: 왼쪽으로 가로선
             isSelected[a][b] = RIGHT;
             isSelected[a][b + 1] = LEFT;
         }
 
         for (int i = 0; i <= 3; i++) {
             if (dfs(0, 0, i)) {
-                result = i;
+                answer = i;
                 break;
             }
         }
 
-        System.out.println(result);
+        System.out.println(answer);
     }
 
     private static boolean dfs(int cnt, int total, int len) {
@@ -42,18 +43,22 @@ public class Main {
             return isValid();
         }
 
-        if (cnt == H * N) {
+        if (cnt == N * H) {
             return false;
         }
 
         int x = cnt / N;
         int y = cnt % N;
 
+        // 오른쪽 방향으로 가로선을 추가하므로 맨 마지막 세로선에는 불가능
+        // 가로선의 시작, 끝 지점에 이미 가로선이 추가된 경우 >> 연속해서 가로선 추가x
         if (y != N - 1 && isSelected[x][y] == 0 && isSelected[x][y + 1] == 0) {
             isSelected[x][y] = RIGHT;
             isSelected[x][y + 1] = LEFT;
 
-            if (dfs(cnt + 1, total + 1, len)) return true;
+            if (dfs(cnt + 1, total + 1, len)) {
+                return true;
+            }
 
             isSelected[x][y] = 0;
             isSelected[x][y + 1] = 0;
