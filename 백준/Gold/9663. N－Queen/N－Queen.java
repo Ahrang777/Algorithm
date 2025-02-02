@@ -4,14 +4,13 @@ import java.util.*;
 public class Main {
     static int N, result;
     static int[] queens;
-    static boolean[] visited;
+    
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         N = Integer.parseInt(br.readLine());
 
-        queens = new int[N];
-        visited = new boolean[N];
+        queens = new int[N];       
 
         dfs(0);
 
