@@ -1,45 +1,50 @@
 import java.io.*;
 import java.util.*;
+
 public class Main {
-    static int N, arr[], cal[];
-    static int result = 0;
-    static boolean visit[];
-    public static void main(String[] args)throws IOException{
-        BufferedReader br =new BufferedReader(new InputStreamReader(System.in));
-        
+    static int N, result = Integer.MIN_VALUE;
+    static int[] arr, output;
+    static boolean[] visited;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = null;
+
         N = Integer.parseInt(br.readLine());
+
         arr = new int[N];
-        cal = new int[N];
-        visit = new boolean[N];
-        
-        StringTokenizer st= new StringTokenizer(br.readLine());
-        for(int i=0;i<N;i++){
-            arr[i]=Integer.parseInt(st.nextToken());
+        output = new int[N];
+        visited = new boolean[N];
+
+        st = new StringTokenizer(br.readLine());
+        for (int i = 0; i < N; i++) {
+            arr[i] = Integer.parseInt(st.nextToken());
         }
-        
-        
-        back(0);
+
+        perm(0);
         System.out.println(result);
     }
-    
-    static void back(int depth){
-        if(depth==N){
-            int sum = 0;
-            for(int i=0;i<N-1;i++){
-                sum += Math.abs(cal[i]-cal[i+1]);
+
+    private static void perm(int cnt) {
+        if (cnt == N) {
+            int total = 0;
+            for (int i = 0; i < N - 1; i++) {
+                total += Math.abs(output[i] - output[i + 1]);
             }
-            result = Math.max(result, sum);
+
+            result = Math.max(result, total);
+
             return;
         }
-        
-        for(int i=0; i<N; i++){
-            if(!visit[i]){
-                visit[i]=true;
-                cal[depth]=arr[i];
-                back(depth+1);
-                visit[i]=false;
+
+        for (int i = 0; i < N; i++) {
+            if (visited[i]) {
+                continue;
             }
+
+            visited[i] = true;
+            output[cnt] = arr[i];
+            perm(cnt + 1);
+            visited[i] = false;
         }
     }
-    
 }
