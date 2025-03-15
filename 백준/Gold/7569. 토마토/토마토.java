@@ -1,29 +1,23 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 
 public class Main {
     static class Node {
-        int h, x, y, time;
+        int x, y, h, time;
 
-        public Node(int h, int x, int y, int time) {
-            this.h = h;
+        public Node(int x, int y, int h, int time) {
             this.x = x;
             this.y = y;
+            this.h = h;
             this.time = time;
         }
     }
-
-    static int M, N, H, map[][][], unripeCnt, min;
-
+    static int N, M, H, total, result;
+    static int[][][] map;
     static List<Node> list;
-
-    // h, x, y
-    static int[][] d = {
-            {-1, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 0, -1}, {0, 1, 0}, {0, 0, 1}
-    };
-
+    static int[] dx = {-1, 0, 1, 0, 0, 0};
+    static int[] dy = {0, 1, 0, -1, 0, 0};
+    static int[] dh = {0, 0, 0, 0, -1, 1};
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
@@ -34,7 +28,7 @@ public class Main {
 
         map = new int[H][N][M];
         list = new ArrayList<>();
-        min = Integer.MAX_VALUE;
+        total = N * M * H;
 
         for (int h = 0; h < H; h++) {
             for (int x = 0; x < N; x++) {
@@ -42,14 +36,10 @@ public class Main {
                 for (int y = 0; y < M; y++) {
                     map[h][x][y] = Integer.parseInt(st.nextToken());
 
-                    // 익지 않은 토마토
-                    if (map[h][x][y] == 0) {
-                        unripeCnt++;
-                    }
-
-                    // 익은 토마토
                     if (map[h][x][y] == 1) {
-                        list.add(new Node(h, x, y, 0));
+                        list.add(new Node(x, y, h, 0));
+                    } else if (map[h][x][y] == -1) {
+                        total--;
                     }
                 }
             }
@@ -57,7 +47,7 @@ public class Main {
 
         bfs();
 
-        System.out.println(unripeCnt == 0 ? min : -1);
+        System.out.println(total == 0 ? result : -1);
     }
 
     private static void bfs() {
@@ -69,24 +59,26 @@ public class Main {
 
         while (!q.isEmpty()) {
             Node now = q.poll();
+            total--;
+
+            result = Math.max(result, now.time);
 
             for (int i = 0; i < 6; i++) {
-                int nh = now.h + d[i][0];
-                int nx = now.x + d[i][1];
-                int ny = now.y + d[i][2];
+                int nx = now.x + dx[i];
+                int ny = now.y + dy[i];
+                int nh = now.h + dh[i];
 
-                min = now.time;
+                if (!isRange(nx, ny, nh) || map[nh][nx][ny] != 0) {
+                    continue;
+                }
 
-                if (!isRange(nh, nx, ny) || map[nh][nx][ny] != 0)    continue;
-
-                unripeCnt--;
+                q.offer(new Node(nx, ny, nh, now.time + 1));
                 map[nh][nx][ny] = 1;
-                q.offer(new Node(nh, nx, ny, now.time + 1));
             }
         }
     }
 
-    private static boolean isRange(int h, int x, int y) {
-        return h >= 0 && h < H && x >= 0 && x < N && y >= 0 && y < M;
+    private static boolean isRange(int x, int y, int h) {
+        return x >= 0 && x < N && y >= 0 && y < M && h >= 0 && h < H;
     }
 }
