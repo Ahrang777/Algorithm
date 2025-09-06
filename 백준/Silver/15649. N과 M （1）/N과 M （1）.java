@@ -1,35 +1,30 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
 public class Main {
-    static int N, M;
-    static StringBuilder sb;
+    static int N, M, arr[];
     static boolean[] visited;
-    static int[] output;
+
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
+        StringBuilder sb = new StringBuilder();
 
-        sb = new StringBuilder();
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
+        arr = new int[M];
         visited = new boolean[N];
-        output = new int[M];
 
-        dfs(0);
-
-        System.out.println(sb.toString());
+        permutation(0, sb);
+        System.out.println(sb);
     }
 
-    private static void dfs(int cnt) {
+    private static void permutation(int cnt, StringBuilder sb) {
         if (cnt == M) {
-            for (int out : output) {
-                sb.append(out).append(" ");
+            for (int n : arr) {
+                sb.append(n).append(" ");
             }
             sb.append("\n");
-
             return;
         }
 
@@ -39,8 +34,8 @@ public class Main {
             }
 
             visited[i] = true;
-            output[cnt] = i + 1;
-            dfs(cnt + 1);
+            arr[cnt] = i + 1;
+            permutation(cnt + 1, sb);
             visited[i] = false;
         }
     }
