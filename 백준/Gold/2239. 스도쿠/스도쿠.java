@@ -1,21 +1,21 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.util.*;
 
 public class Main {
-    final static int N = 9;
+    static int[][] board;
+    static int N;
     static boolean isEnd;
-    static int[][] map;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringBuilder sb = new StringBuilder();
-
-        map = new int[N][N];
+        N = 9;
+        board = new int[N][N];
 
         for (int i = 0; i < N; i++) {
             String str = br.readLine();
+
             for (int j = 0; j < N; j++) {
-                map[i][j] = str.charAt(j) - '0';
+                board[i][j] = str.charAt(j) - '0';
             }
         }
 
@@ -23,7 +23,7 @@ public class Main {
 
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                sb.append(map[i][j]);
+                sb.append(board[i][j]);
             }
             sb.append("\n");
         }
@@ -34,42 +34,47 @@ public class Main {
     private static void dfs(int cnt) {
         if (cnt == 81) {
             isEnd = true;
+
             return;
         }
 
         int x = cnt / N, y = cnt % N;
 
-        if (map[x][y] == 0) {
+        if (board[x][y] != 0) {
+            dfs(cnt + 1);
+        } else {
             for (int i = 1; i <= N; i++) {
                 if (!isValid(x, y, i)) {
                     continue;
                 }
 
-                map[x][y] = i;
+                board[x][y] = i;
                 dfs(cnt + 1);
+
                 if (isEnd) {
                     return;
                 }
-                map[x][y] = 0;
+                board[x][y] = 0;
             }
-        } else {
-            dfs(cnt + 1);
         }
     }
 
-    private static boolean isValid(int x, int y, int num) {
+    private static boolean isValid(int x, int y, int target) {
+        // 가로, 세로
         for (int i = 0; i < N; i++) {
-            if (map[x][i] == num || map[i][y] == num) {
+            if (board[x][i] == target || board[i][y] == target) {
                 return false;
             }
         }
 
-        x = x / 3 * 3;
-        y = y / 3 * 3;
+        // 3x3
+        int sx = x / 3 * 3, sy = y / 3 * 3;
 
-        for (int i = x; i < x + 3; i++) {
-            for (int j = y; j < y + 3; j++) {
-                if (map[i][j] == num)   return false;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[sx + i][sy + j] == target) {
+                    return false;
+                }
             }
         }
 
