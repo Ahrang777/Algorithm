@@ -1,68 +1,64 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
+
 public class Main {
-    static class Node implements Comparable<Node> {
-        int l, h;
-
-        public Node(int l, int h) {
-            this.l = l;
-            this.h = h;
-        }
-
-        @Override
-        public int compareTo(Node o) {
-            return Integer.compare(this.l, o.l);
-        }
-    }
-    static int N;
-    static List<Node> list;
-
+    static StringBuilder sb = new StringBuilder();
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = null;
-
-        N = Integer.parseInt(br.readLine());
-        list = new ArrayList<>();
-
+        int N = Integer.parseInt(br.readLine());
+        int[] arr = new int[1001];
+        int start = Integer.MAX_VALUE;
+        int end = 0;
         for (int i = 0; i < N; i++) {
-            st = new StringTokenizer(br.readLine());
-
-            int l = Integer.parseInt(st.nextToken());
-            int h = Integer.parseInt(st.nextToken());
-
-            list.add(new Node(l, h));
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            int L = Integer.parseInt(st.nextToken());
+            int H = Integer.parseInt(st.nextToken());
+            arr[L] = H;
+            start = Math.min(L, start);
+            end = Math.max(L, end);
         }
 
-        Collections.sort(list);
+        Stack<Integer> height = new Stack<>();
+        //왼쪽 비교
+        int temp = arr[start];
+        for (int i = start + 1; i <= end; i++) {
+            if(arr[i] < temp)  { 
+                height.push(i); 
+            }
+            else {
+                while (!height.isEmpty()) {
+                    int x = height.pop(); 
+                    arr[x] = temp; 
+                }
+                temp = arr[i];
+            }
+        }
+        height.clear();
 
-        int maxIndex = 0;
-        for (int i = 0; i < N; i++) {
-            if (list.get(i).h > list.get(maxIndex).h) {
-                maxIndex = i;
+
+
+        //오른쪽 비교
+        temp=arr[end];
+        for(int i = end - 1; i >= start; i--){
+            if(arr[i] < temp) height.push(i);
+            else {
+                while (!height.isEmpty()) {
+                    int x = height.pop();
+                    arr[x]=temp;
+                }
+                temp=arr[i];
             }
         }
 
-        // 최고높이
-        int total = list.get(maxIndex).h;
-
-        // 왼쪽 -> 최고높이
-        int leftMax = list.get(0).h;
-
-        for (int i = 0; i < maxIndex; i++) {
-            leftMax = Math.max(leftMax, list.get(i).h);
-            int width = list.get(i + 1).l - list.get(i).l;
-            total += leftMax * width;
+        int result = 0;
+        for (int i = start; i <= end; i++) {
+            result += arr[i];
         }
 
-        // 오른쪽 -> 최고높이
-        int rightMax = list.get(N - 1).h;
-        for (int i = N - 1; i > maxIndex; i--) {
-            rightMax = Math.max(rightMax, list.get(i).h);
-            int width = list.get(i).l - list.get(i - 1).l;
-            total += rightMax * width;
-        }
-
-        System.out.println(total);
+        sb.append(result).append("\n");
+        System.out.print(sb);
     }
 }
