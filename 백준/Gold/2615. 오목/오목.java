@@ -10,9 +10,6 @@ public class Main {
 
     // 좌표가 좌상단부터 -> 방향, 끝에 도달하면 아래로 한칸 내려서 다시 좌측부터 시작하는데
     // 굳이 이전좌표 확인필요 없다. 이미 다 확인하고 넘어온것
-//    static int[] dx = {0, 1, 1, 1};
-//    static int[] dy = {1, 1, 0, -1};
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = null;
@@ -37,6 +34,9 @@ public class Main {
 
                 int target = map[i][j];
 
+                // 좌표가 좌상단부터 -> 방향, 끝에 도달하면 아래로 한칸 내려서 다시 좌측부터 시작하는데
+                // 굳이 이전좌표 확인필요 없다. 이미 다 확인하고 넘어온것
+                // 0, 0 ~ 0, 18 -> 1, 0 ~ 1, 18 이런 흐름
                 for (int d = 2; !isFinished && d <= 5; d++) {
                     if (isFinished(1, i, j, d)) {
                         //육목체크
